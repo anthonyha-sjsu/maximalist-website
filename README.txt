@@ -14,12 +14,12 @@ EDITING
 app.js: projects, category tags, artwork details and cable routing.
 style.css: core styles. object-skin.css: Max-inspired box styling.
 launch.js: countdown and celebration behavior.
-showcase.js / showcase.css: the rotating homepage showcase (toggle, metro, urn, p showcase). Change INTERVAL in showcase.js to set the speed. It follows the gallery filter, holds the gallery's works count on wide screens, and frames vertical or square pieces whole (WIDE_ENOUGH sets the cutoff) so the window never changes size. Remove both files' tags from index.html to take it off.
+showcase.js / showcase.css: the Patch of the week showcase (toggle, number box -> metro, counter). It steps through one work's views. Pick the work with PATCH_OF_THE_WEEK at the top of the data in app.js. The number box sets the metro speed: drag it, or click and type.
 credits.html: team / CADRE / SJSU information.
-submit.html: the How to submit guide (what to send, description examples, rules, review steps).
+submit.html: the Submit a patch page: the guide (what to send, examples, rules, review steps) with the form right below it (submit-form.js).
 
 ADDING A WORK (app.js)
-Each work can have: title, artist, semester ('Fall 2026'), categories, description,
+Each work can have: title, artist, categories, description,
 portfolioUrl, coverUrl + imageAspect, patchPreview (patching screenshot), patchFileUrl,
 previewVideo (MP4) + previewPoster, or previewAudio (MP3), and previewNote.
 The Preview section and Portfolio link only show up when those fields are filled in.
@@ -37,3 +37,8 @@ Opening a work: the clicked card (or the showcase) grows into the artwork window
 Patching screenshots zoom: double-click, pinch, or the - / + / fit buttons; drag to look around.
 transitions.js: pages fade between each other while the header stays still.
 launch.js: the countdown digits roll like an odometer.
+
+Filter: the "filter" menu object above the gallery. Its colored outlets send the cables to the first row of cards, and the cables take the active filter's color.
+Category colors: --c-sound, --c-visual, --c-interactive, --c-3d, --c-other at the bottom of style.css (dark versions in dark.css).
+Gallery / List switch: at the bottom of the filter menu (Layout). The choice is remembered per browser.
+submit-form.js: the submission form. Files are picked from the visitor's computer (click or drag and drop) and previewed with a live card whose glow comes from the tags. Nothing is uploaded yet; once there's a server, send the FormData from collect() in the submit handler.
