@@ -1,0 +1,91 @@
+/* Lights off: a dark theme modeled on Max's dark patcher. Turned on by the moon button
+   in the footer (theme.js). Everything here only applies when html has data-theme="dark". */
+
+/* The toggle itself (shown in both themes) */
+.theme-toggle{display:inline-grid;place-items:center;width:30px;height:30px;padding:0;margin-left:14px;border:0;background:transparent;color:var(--ink);opacity:.5;transition:opacity .2s}
+.theme-toggle:hover{opacity:1;background:transparent}
+.theme-toggle svg{grid-area:1/1;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .5s cubic-bezier(.3,1.4,.5,1),opacity .3s}
+.theme-toggle .icon-sun{opacity:0;transform:rotate(-90deg) scale(.4)}
+:root[data-theme="dark"] .theme-toggle .icon-moon{opacity:0;transform:rotate(90deg) scale(.4)}
+:root[data-theme="dark"] .theme-toggle .icon-sun{opacity:1;transform:none}
+:root[data-theme="dark"] .theme-toggle:hover{color:var(--ink)}
+:root.theme-vt::view-transition-old(root),:root.theme-vt::view-transition-new(root){animation:none;mix-blend-mode:normal}
+.theme-fading,.theme-fading *{transition:background-color .4s ease,color .4s ease,border-color .4s ease!important}
+
+/* Palette */
+:root[data-theme="dark"]{--paper:#1e201f;--ink:#e7e5de;--line:#7d817a;--yellow:#e6b866;--wire:#e0a24a;color-scheme:dark}
+:root[data-theme="dark"] main{background-image:radial-gradient(#363a35 .85px,transparent .85px)}
+
+/* Text on the amber accent stays dark so it reads */
+:root[data-theme="dark"] .submit,:root[data-theme="dark"] .rsvp,:root[data-theme="dark"] .eyebrow,:root[data-theme="dark"] .filters button.active,:root[data-theme="dark"] .primary,:root[data-theme="dark"] .tags span,:root[data-theme="dark"] .skip,
+:root[data-theme="dark"] button:hover,:root[data-theme="dark"] .explore:hover,:root[data-theme="dark"] .portfolio-link:hover,:root[data-theme="dark"] .guide-link a:hover,:root[data-theme="dark"] .audio-player.playing .ap-toggle{color:#1a1b1a}
+:root[data-theme="dark"] .card:hover,:root[data-theme="dark"] nav>button:not(.submit):hover,:root[data-theme="dark"] .filters button:not(.active):hover,:root[data-theme="dark"] .sc-stage:hover,:root[data-theme="dark"] .sc-bang:hover,:root[data-theme="dark"] .theme-toggle:hover,:root[data-theme="dark"] .dialog-nav button:hover{color:var(--ink)}
+:root[data-theme="dark"] .rsvp:hover,:root[data-theme="dark"] .open-patcher:hover{background:#f0c77d;color:#1a1b1a}
+
+/* Muted text */
+:root[data-theme="dark"] .card p,:root[data-theme="dark"] .footer-note,:root[data-theme="dark"] .below,:root[data-theme="dark"] #count,:root[data-theme="dark"] .sc-meta,:root[data-theme="dark"] .ap-time,:root[data-theme="dark"] .artist-row span,:root[data-theme="dark"] .sc-window .object-name span:last-child{color:#a2a69b}
+:root[data-theme="dark"] .max-intro{color:#b3b7ab}
+:root[data-theme="dark"] .detail-caption,:root[data-theme="dark"] .patch-section-title>span,:root[data-theme="dark"] .patch-preview figcaption,:root[data-theme="dark"] .patch-empty p,:root[data-theme="dark"] .preview-note,:root[data-theme="dark"] form label small,:root[data-theme="dark"] .tag-options legend small,:root[data-theme="dark"] .example small,:root[data-theme="dark"] .sc-comment,:root[data-theme="dark"] .artwork-dialog #dialog-body .preview-note{color:#8c9086}
+:root[data-theme="dark"] .artwork-dialog h3,:root[data-theme="dark"] .artwork-dialog #dialog-body .patch-help,:root[data-theme="dark"] .credit-block small{color:#9ca196}
+:root[data-theme="dark"] .credits .note{color:#a2a69b}
+:root[data-theme="dark"] #launch-status{color:#b5bd98}
+
+/* Lines and surfaces */
+:root[data-theme="dark"] .lock{border-right-color:#555}
+:root[data-theme="dark"] dialog{border-color:#565a54;box-shadow:12px 12px 0 #0007}
+:root[data-theme="dark"] .dialog-top{border-bottom-color:#4a4e48}
+:root[data-theme="dark"] input,:root[data-theme="dark"] textarea,:root[data-theme="dark"] form select{background:#ffffff0a;border-color:#5f635c}
+:root[data-theme="dark"] .tag-options{border-color:#5f635c}
+:root[data-theme="dark"] .notice{background:#2a2d29}
+:root[data-theme="dark"] .artist-row{border-top-color:#3d413b}
+:root[data-theme="dark"] .cover-image{background:#2a2d29}
+:root[data-theme="dark"] .patch-section{border-top-color:#3f433d}
+:root[data-theme="dark"] .patch-preview{border-color:#4a4e48;background:#232624}
+:root[data-theme="dark"] .patch-empty{border-color:#4f544c;background-image:radial-gradient(#363a35 .7px,transparent .7px)}
+:root[data-theme="dark"] .empty-object{border-color:#5f6559}
+:root[data-theme="dark"] .open-patcher{border-color:#7d817a}
+:root[data-theme="dark"] .open-patcher:disabled,:root[data-theme="dark"] .open-patcher:disabled:hover{background:#2a2d29;color:#6f736b;border-color:#3f433d}
+:root[data-theme="dark"] .audio-player{background-image:radial-gradient(#363a35 .7px,transparent .7px)}
+:root[data-theme="dark"] .ap-scrub::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--ink) var(--fill,0%),#3f433d var(--fill,0%))}
+:root[data-theme="dark"] .ap-scrub::-moz-range-track{background:#3f433d}
+:root[data-theme="dark"] .guide code{background:#2e312d}
+:root[data-theme="dark"] .example{border-color:#4f544c}
+:root[data-theme="dark"] .card:hover,:root[data-theme="dark"] .example.good{box-shadow:4px 5px 0 #0b0c0b}
+
+/* Launch banner */
+:root[data-theme="dark"] .launch{background:linear-gradient(105deg,#2c261c,#25221d 65%,#22211e);border-bottom-color:#4d4433}
+:root[data-theme="dark"] .launch p,:root[data-theme="dark"] .launch-note{color:#b0a68f}
+:root[data-theme="dark"] .clock b{background:#2a2620;border-color:#5c4f3a;box-shadow:0 2px 0 #15130f}
+
+/* Max objects: title box, ports, filters, cords */
+:root[data-theme="dark"] .title-object{border-top-color:#6b7168;border-bottom-color:#6b7168;border-left-color:#7d817a;border-right-color:#7d817a}
+:root[data-theme="dark"] .title-object .ports i{background:#c9ccc2}
+:root[data-theme="dark"] .ports.bottom i:not(.active-port){background:#565a53}
+:root[data-theme="dark"] .card:not(.connected) .inlet{background:#5f635c}
+:root[data-theme="dark"] .filters button{border-color:#6b6f68;box-shadow:inset 0 -2px 0 #2c2f2b}
+:root[data-theme="dark"] .filters button.active{box-shadow:inset 0 -2px 0 #a4782f}
+:root[data-theme="dark"] .filters button:not(.active):hover{background:#3a3326}
+:root[data-theme="dark"] .cords path.cable-base{stroke:#5e635b}
+
+/* Showcase */
+:root[data-theme="dark"] .sc-cords path{stroke:#9a9e95}
+:root[data-theme="dark"] .sc-window{box-shadow:5px 6px 0 #0b0c0b}
+:root[data-theme="dark"] .sc-msg{background:#2f322e;border-color:#6b6f68;box-shadow:inset 0 -2px 0 #222421}
+:root[data-theme="dark"] .sc-layer.framed{background:#232624 radial-gradient(#363a35 .9px,transparent .9px) 0 0/18px 18px}
+:root[data-theme="dark"] .sc-layer.framed>*{box-shadow:4px 5px 0 #0b0c0b}
+:root[data-theme="dark"] .sc-progress{background:#353934}
+:root[data-theme="dark"] .showcase.paused .sc-live{background:#5f635c}
+
+/* Placeholder art only: flip it dark, like Max's dark patcher. Real student images are never
+   color-flipped. If a student sends a second screenshot with Max's dark theme on, the site
+   shows that one in dark mode instead (coverUrlDark / patchPreviewDark in app.js). */
+:root[data-theme="dark"] .placeholder-art{filter:invert(.9) hue-rotate(180deg)}
+/* Inverted pieces flip their shadow too, so give them a light one that inverts to dark */
+:root[data-theme="dark"] .sc-layer.framed>.placeholder-art{box-shadow:4px 5px 0 #f4f5f0}
+/* Light / dark image pairs */
+.only-dark{display:none!important}
+:root[data-theme="dark"] .only-light{display:none!important}
+:root[data-theme="dark"] .only-dark{display:block!important}
+:root[data-theme="dark"] .keys dd{color:#a2a69b}
+:root[data-theme="dark"] kbd{background:#2f322e;border-color:#6b6f68;box-shadow:inset 0 -2px 0 #222421}
+:root[data-theme="dark"] .zoom-level{color:#a2a69b}

@@ -1,0 +1,82 @@
+/* Rotating showcase: a tiny patch (toggle -> metro -> urn) feeding a p showcase window.
+   Remove this stylesheet link and showcase.js to take it off the homepage. */
+.showcase{position:absolute;top:0;right:8px;width:clamp(360px,34vw,540px);font-size:12px}
+.sc-patch{position:relative;height:104px}
+.sc-cords{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0}
+.sc-cords path{fill:none;stroke:#5d605b;stroke-width:1.5;transition:stroke .3s}
+.sc-cords path.hot{stroke:#d99a3e;stroke-width:2;transition:none}
+
+/* Small Max boxes. Ports sit on the edge like real inlets and outlets. */
+.sc-node{position:absolute;z-index:1;height:24px;background:var(--paper);border:1px solid var(--line)}
+.sc-node:before,.sc-node:after{content:'';position:absolute;left:3px;width:7px;height:4px;background:var(--ink)}
+.sc-node:before{top:-3px}
+.sc-node:after{bottom:-3px}
+.sc-obj{display:flex;align-items:center;padding:0 10px;font-size:12px;white-space:nowrap}
+.sc-toggle,.sc-bang{width:24px;padding:0}
+.sc-toggle{top:0;left:0}
+.sc-metro{top:40px;left:0}
+.sc-bang{top:80px;left:0;display:grid;place-items:center}
+.sc-urn{top:80px;left:44px}
+
+.sc-toggle span{position:absolute;inset:4px;opacity:0;background:linear-gradient(45deg,transparent 45%,var(--ink) 45% 55%,transparent 55%),linear-gradient(-45deg,transparent 45%,var(--ink) 45% 55%,transparent 55%)}
+.sc-toggle[aria-pressed="true"] span{opacity:1}
+.sc-toggle:hover{background:var(--yellow)}
+.sc-bang:hover{background:var(--paper)}
+.sc-bang:hover span{border-color:#b3782a}
+.sc-bang span{width:14px;height:14px;border:1px solid var(--ink);border-radius:50%}
+.sc-bang.hit span{animation:sc-bang .3s ease-out}
+@keyframes sc-bang{from{background:#e0a24a}to{background:transparent}}
+
+/* Max comments are plain text sitting in the patch. */
+.sc-comment{position:absolute;z-index:1;color:#73766d;font-size:11px;white-space:nowrap;background:var(--paper);padding:0 3px}
+.sc-comment.c-toggle{top:5px;left:34px}
+.sc-comment.c-metro{top:45px;left:112px}
+.sc-comment.c-urn{top:85px;left:134px}
+
+/* The p showcase window borrows the card styling. */
+.sc-window{position:relative;margin-top:22px;background:var(--paper);border:1px solid var(--line);padding:0 4px 10px;box-shadow:5px 6px 0 #d5d6c7}
+.sc-window>.inlet{transform:translateX(-50%)}
+.sc-window .object-name span:last-child{opacity:1;color:#646761;font-size:13px}
+.sc-window .object-name .sc-live{display:inline-block;width:7px;height:7px;margin-right:8px;background:#c07a28;border-radius:50%;animation:blink 2s infinite}
+.showcase.paused .sc-live{animation:none;background:#9b9e94}
+/* Fixed stage size: every piece fits this frame, so the window never jumps around. */
+.sc-stage{position:relative;display:block;width:100%;padding:0;border:0;aspect-ratio:16/10;overflow:hidden;background:#141514}
+.sc-stage:hover{background:#141514}
+.sc-stage:focus-visible{outline-offset:2px}
+.sc-layer{position:absolute;inset:0;overflow:hidden}
+/* Wide work: fill the stage, trimming a little off the edges if needed. */
+.sc-layer>*{display:block;width:100%;height:100%;aspect-ratio:auto!important}
+.sc-layer>.art{position:absolute;top:0;left:50%;width:auto;aspect-ratio:451/254!important;transform:translateX(-50%)}
+.sc-layer>.cover-image{object-fit:cover}
+.sc-layer>.placeholder-art{display:flex}
+/* Vertical or square work: shown whole, as a box sitting on the patcher grid. */
+.sc-layer.framed{display:flex;align-items:center;justify-content:center;padding:16px;background:#e9e9e2 radial-gradient(#c3c6bd .9px,transparent .9px) 0 0/18px 18px}
+.sc-layer.framed>*{width:auto;height:100%;max-width:100%;aspect-ratio:var(--ar)!important;border:1px solid var(--line);box-shadow:4px 5px 0 #d5d6c7}
+.sc-layer.framed>.cover-image{object-fit:contain;background:var(--paper)}
+.sc-layer.framed .placeholder-num{font-size:40px;left:12px}
+.sc-layer.framed .placeholder-label{left:12px;bottom:10px;font-size:9px}
+.sc-progress{height:2px;background:#d5d6c7}
+.sc-progress i{display:block;height:100%;background:var(--ink);transform-origin:left;transform:scaleX(0)}
+
+.sc-info{position:relative;padding:10px 6px 0}
+.sc-title{font-size:19px;line-height:1.3;font-weight:500;margin:0;padding-right:118px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-meta{font-size:12px;line-height:1.5;color:#646761;margin:3px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-msgs{position:absolute;top:10px;right:6px;display:flex;gap:6px}
+/* Max message boxes: softer fill, rounded corners, flash when clicked. */
+.sc-msg{background:#e2e4d9;border:1px solid #8f9386;border-radius:4px;box-shadow:inset 0 -2px 0 #c9cebc;padding:3px 10px;font-size:12px}
+.sc-msg.hit{animation:sc-msg .3s ease-out}
+@keyframes sc-msg{from{background:#e0a24a}}
+
+/* The gallery count moves here on wide screens (see showcase.js). */
+.sc-foot{display:flex;justify-content:flex-end;margin-top:14px;min-height:16px}
+.sc-foot:empty{display:none}
+.sc-foot #count{margin:0;padding:0 2px;background:var(--paper)}
+
+/* Below 1280px there is no empty right column, so the showcase drops under the intro. */
+@media(max-width:1279px){.showcase{position:relative;top:auto;right:auto;width:auto;max-width:520px;margin:48px 0 0 8px}}
+@media(max-width:640px){.showcase{margin-left:0;max-width:none}
+.sc-comment.c-urn{display:none}
+.sc-title{padding-right:0}
+.sc-msgs{position:static;margin-top:10px}
+}
+@media(prefers-reduced-motion:reduce){.sc-window .object-name .sc-live,.sc-bang.hit span,.sc-msg.hit{animation:none}}
