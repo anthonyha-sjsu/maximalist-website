@@ -19,7 +19,7 @@
 /* Text on the amber accent stays dark so it reads */
 :root[data-theme="dark"] .submit,:root[data-theme="dark"] .rsvp,:root[data-theme="dark"] .eyebrow,:root[data-theme="dark"] .filters button.active,:root[data-theme="dark"] .primary,:root[data-theme="dark"] .tags span,:root[data-theme="dark"] .skip,
 :root[data-theme="dark"] button:hover,:root[data-theme="dark"] .explore:hover,:root[data-theme="dark"] .portfolio-link:hover,:root[data-theme="dark"] .guide-link a:hover,:root[data-theme="dark"] .audio-player.playing .ap-toggle{color:#1a1b1a}
-:root[data-theme="dark"] .card:hover,:root[data-theme="dark"] nav>button:not(.submit):hover,:root[data-theme="dark"] .filters button:not(.active):hover,:root[data-theme="dark"] .sc-stage:hover,:root[data-theme="dark"] .sc-bang:hover,:root[data-theme="dark"] .theme-toggle:hover,:root[data-theme="dark"] .dialog-nav button:hover{color:var(--ink)}
+:root[data-theme="dark"] .card:hover,:root[data-theme="dark"] nav>button:not(.submit):hover,:root[data-theme="dark"] .filters button:not(.active):hover,:root[data-theme="dark"] .sc-stage:hover,:root[data-theme="dark"] .sc-bang:hover,:root[data-theme="dark"] .theme-toggle:hover{color:var(--ink)}
 :root[data-theme="dark"] .rsvp:hover,:root[data-theme="dark"] .open-patcher:hover{background:#f0c77d;color:#1a1b1a}
 
 /* Muted text */
@@ -123,3 +123,19 @@
 :root[data-theme="dark"] .fm-layout-label{color:#a2a69b}
 :root[data-theme="dark"] .filter-menu .view-toggle button[aria-checked="false"]:hover,:root[data-theme="dark"] .filter-menu .view-toggle button[aria-checked="false"]:focus-visible{background:#2a2c29}
 :root[data-theme="dark"] .filter-menu .view-toggle button[aria-checked="true"]{color:#1a1b1a}
+:root[data-theme="dark"] .what-is-max summary{background:#2f322e;box-shadow:inset 0 -2px 0 #222421}
+:root[data-theme="dark"] .what-is-max summary:hover{background:#3a3326}
+:root[data-theme="dark"] .what-is-max[open] summary{background:var(--yellow);color:#1a1b1a}
+:root[data-theme="dark"] .wm-body{box-shadow:5px 6px 0 #0b0c0b}
+:root[data-theme="dark"] .wm-example{background:#232624 radial-gradient(#363a35 .7px,transparent .7px) 0 0/14px 14px;border-color:#4f544c}
+:root[data-theme="dark"] .wm-cap{color:#a2a69b}
+:root[data-theme="dark"] .wm-cords .base{stroke:#5e635b}
+/* Buttons that keep a dark background on hover keep light text too */
+:root[data-theme="dark"] .filter-button:hover,:root[data-theme="dark"] .filter-button:hover .fb-text,:root[data-theme="dark"] .filter-button:hover .fb-caret,
+:root[data-theme="dark"] .sc-msg:hover,:root[data-theme="dark"] .sc-number:hover{color:var(--ink)}
+:root[data-theme="dark"] .sc-msg:hover{background:#3a3d38}
+:root[data-theme="dark"] .dialog-top button:hover,:root[data-theme="dark"] .sc-toggle:hover{color:#1a1b1a}
+:root[data-theme="dark"] .open-patcher:disabled,:root[data-theme="dark"] .open-patcher:disabled:hover{color:#8a8e85}
+:root[data-theme="dark"] .fm-cords .fm-base{stroke:#5e635b}
+:root[data-theme="dark"] .fm-hint{color:#a2a69b}
+:root[data-theme="dark"] .filter-object.menu-open .filter-button,:root[data-theme="dark"] .filter-object.menu-open .filter-button:hover{box-shadow:6px 7px 0 #0b0c0b}

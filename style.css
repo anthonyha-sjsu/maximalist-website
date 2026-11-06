@@ -319,3 +319,74 @@ kbd{display:inline-block;min-width:26px;text-align:center;font:inherit;font-size
 .filter-menu .view-toggle button[aria-checked="true"]{background:var(--yellow);color:#1a1b1a}
 .filter-menu .view-toggle button[aria-checked="false"]:hover,.filter-menu .view-toggle button[aria-checked="false"]:focus-visible{background:#ebe7da}
 .view-toggle span{display:inline!important}
+
+/* "What is Max?" explainer under the title */
+.what-is-max{position:relative;z-index:3;margin:26px 0 0 8px;max-width:600px}
+.what-is-max summary{display:inline-flex;align-items:center;gap:10px;list-style:none;cursor:pointer;padding:6px 14px 6px 6px;border:1px solid var(--line);border-radius:4px;background:#e2e4d9;box-shadow:inset 0 -2px 0 #c9cebc;font-size:14px;user-select:none;transition:background .2s}
+.what-is-max summary::-webkit-details-marker{display:none}
+.what-is-max summary:hover{background:#ece5cf}
+.what-is-max[open] summary{background:var(--yellow);color:#1a1b1a}
+.wm-q{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--paper);font-size:13px;font-weight:600;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.what-is-max[open] .wm-q{transform:rotate(360deg)}
+.wm-body{margin-top:14px;padding:18px 20px;background:var(--paper);border:1px solid var(--line);box-shadow:5px 6px 0 #d5d6c7;font-size:14px;line-height:1.7}
+.wm-body p{margin:0}
+.wm-body p+div,.wm-body div+p{margin-top:16px}
+.wm-body b{font-weight:600}
+.wm-example{position:relative;display:grid;gap:22px;padding:16px 14px 18px;background:#eceae3 radial-gradient(#d4d6cc .7px,transparent .7px) 0 0/14px 14px;border:1px dashed #a1a88e}
+/* Objects step down and to the right, like a patch flowing downward; captions sit beside them like Max comments */
+.wm-step{position:relative;z-index:1;display:flex;align-items:center;gap:14px}
+.wm-step:nth-of-type(2){margin-left:54px}
+.wm-step:nth-of-type(3){margin-left:108px}
+.wm-obj{position:relative;flex:none;padding:3px 9px;border:1px solid var(--line);background:var(--paper);font-size:12px;white-space:nowrap}
+.wm-obj::before,.wm-obj::after{content:'';position:absolute;left:3px;width:7px;height:3px;background:var(--ink)}
+.wm-obj::before{top:-2px}.wm-obj::after{bottom:-2px}
+.wm-cap{font-size:11px;line-height:1.4;color:#646761}
+.wm-cords{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0}
+.wm-cords path{fill:none;stroke-width:2;stroke-linecap:butt}
+.wm-cords .base{stroke:#3a4036}
+.wm-cords .stripe{stroke:var(--cat);stroke-dasharray:4 5;animation:signal-flow 1.25s linear infinite}
+@media(max-width:640px){.what-is-max{margin-left:0}.wm-step:nth-of-type(2){margin-left:28px}.wm-step:nth-of-type(3){margin-left:56px}.wm-step{gap:10px}}
+@media(prefers-reduced-motion:reduce){.wm-q{transition:none}.wm-cords .stripe{animation:none}}
+.wm-body{overflow:hidden}
+/* Keep the header "Submit a patch" button orange on hover */
+nav>a.submit:hover{background:#e8b865;text-decoration:none}
+.detail-statement{margin-bottom:18px!important}
+.form-section .examples+.note,.examples+.note{margin-top:22px}
+
+/* The filter's patch cord (see app.js): it runs down the left of the menu into each category's inlet */
+.filter-menu{padding-left:30px}
+.filter-menu button[data-filter]{grid-template-columns:9px 34px 1fr 30px;gap:12px}
+.filter-menu button[data-filter] .n{text-align:left}
+.filter-menu .fm-label{text-align:right}
+.fm-in{display:block;width:9px;height:9px;background:color-mix(in srgb,var(--cat,#8a8e85) 35%,var(--paper));border:1px solid color-mix(in srgb,var(--cat,#8a8e85) 70%,var(--ink));transition:transform .2s,background .2s}
+.filter-menu .all .fm-in{--cat:#8a8e85}
+.filter-menu button[aria-checked="true"] .fm-in,.filter-menu button.drop-target .fm-in{background:var(--cat,#8a8e85)}
+.filter-menu button.drop-target{background:color-mix(in srgb,var(--cat,#999) 20%,var(--paper))}
+.fm-hint{text-align:right}
+.fm-hint{padding:4px 10px 6px;font-size:11px;color:#74796b}
+.fm-cords{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:2;--fm-all:#8a8e85}
+.fm-cords path{fill:none;stroke-width:2;stroke-linejoin:round}
+.fm-cords .fm-base{stroke:#3a4036}
+.fm-cords .fm-stripe{stroke:var(--fm-c);stroke-dasharray:4 5;animation:signal-flow 1.25s linear infinite}
+.fm-cords .fm-src{fill:var(--ink)}
+.fm-cords .fm-hit{stroke:transparent;stroke-width:14;pointer-events:stroke;cursor:grab;touch-action:none}
+/* The plug: a small square connector, like the site's inlets and outlets */
+.fm-cords .fm-plug{fill:var(--fm-c);stroke:var(--ink);stroke-width:1.5;pointer-events:all;cursor:grab;touch-action:none}
+.fm-cords .fm-plug:hover{stroke-width:2.2}
+.fm-cords.dragging,.fm-cords.dragging *{cursor:grabbing}
+.fm-cords.dragging{pointer-events:all}
+@media(prefers-reduced-motion:reduce){.fm-cords .fm-stripe{animation:none}}
+/* The current-page link in the header shouldn't underline the orange Submit button */
+nav>a.submit[aria-current="page"]{text-decoration:none;box-shadow:inset 0 -3px 0 #c07a28}
+nav>a.submit:focus{text-decoration:none}
+/* While the menu is open its cord is the one that matters, so the gallery outlets step back */
+.fo-outlets{transition:opacity .25s}
+.filter-object.menu-open .fo-outlets{opacity:0}
+/* The menu hangs straight off the filter box, sharing its bottom edge, so they read as one object */
+.filter-menu{top:calc(100% - 1px)}
+.filter-object.menu-open .filter-button{box-shadow:none}
+.fm-cords .fm-plug{stroke-width:1}
+/* The plug grows from its own center when it plugs in */
+.fm-cords .fm-plug{transform-box:fill-box;transform-origin:center}
+/* While the menu is open, the filter box and menu share one shadow */
+html .filter-object.menu-open .filter-button,html .filter-object.menu-open .filter-button:hover{box-shadow:6px 7px 0 #d5d6c7}

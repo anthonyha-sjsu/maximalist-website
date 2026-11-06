@@ -107,3 +107,13 @@
 .sc-hint{position:absolute;z-index:8;max-width:230px;padding:7px 9px;font-size:11.5px;line-height:1.45;background:#fffbe6;color:#1a1b1a;border:1px solid var(--line);box-shadow:3px 4px 0 #0000001a;pointer-events:none;opacity:0;transform:translateY(-3px);transition:opacity .18s ease,transform .18s ease}
 .sc-hint.show{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){.sc-hint{transition:none}}
+
+/* "patch of the week" label: only shows while the featured work is up, and lights up as it arrives */
+.showcase .sc-window .object-name span.sc-potw{opacity:0;transform:translateX(8px) scale(.96);transition:opacity .35s ease,transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .6s ease}
+.showcase.is-potw .sc-window .object-name span.sc-potw{opacity:1;transform:none;box-shadow:0 0 10px 1px color-mix(in srgb,var(--yellow) 55%,transparent);animation:potw-breathe 2.6s ease-in-out infinite}
+.showcase.is-potw .sc-window .object-name span.sc-potw.arrive{animation:potw-arrive 1.1s cubic-bezier(.2,.8,.2,1),potw-breathe 2.6s ease-in-out 1.1s infinite}
+@keyframes potw-arrive{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--yellow) 0%,transparent)}35%{box-shadow:0 0 22px 6px color-mix(in srgb,var(--yellow) 95%,transparent)}100%{box-shadow:0 0 10px 1px color-mix(in srgb,var(--yellow) 55%,transparent)}}
+@keyframes potw-breathe{0%,100%{box-shadow:0 0 10px 1px color-mix(in srgb,var(--yellow) 55%,transparent)}50%{box-shadow:0 0 16px 3px color-mix(in srgb,var(--yellow) 75%,transparent)}}
+@media(prefers-reduced-motion:reduce){.showcase .sc-window .object-name span.sc-potw,.showcase.is-potw .sc-window .object-name span.sc-potw.arrive{transition:none;animation:none}}
+/* Very small phones: keep the showcase patch inside the screen */
+@media(max-width:400px){.sc-comment.c-number{display:none}.sc-comment.c-metro{left:76px}}

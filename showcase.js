@@ -1,30 +1,24 @@
-/* Patch of the week: toggle -> metro -> counter -> p student_showcase.
-   The showcase features one work (PATCH_OF_THE_WEEK in app.js) and steps through its views:
-   the output, the patching view, and the preview video if there is one.
-   The number box feeds the metro's right inlet, like in Max: drag it up or down, or click and
-   type, to change how often the view changes (in milliseconds). */
+/* Showcase: toggle -> metro -> urn -> p student_showcase.
+   It opens on the Patch of the Week (PATCH_OF_THE_WEEK in app.js) and holds it a little longer.
+   Then urn (Max's "random without repeats") picks other works, and every few picks the Patch of
+   the Week comes back, with its label lighting up. The rotation follows the gallery filter.
+   The number box feeds the metro's right inlet: drag it, or click and type, to set the speed (ms). */
 (function(){
  const root=document.querySelector('.showcase');
  if(!root||typeof projects==='undefined')return;
  const MIN=250,MAX=10000,START=4500;
  const $=s=>root.querySelector(s);
- const patch=$('.sc-patch'),svg=$('.sc-cords'),toggle=$('.sc-toggle'),numBox=$('.sc-number'),numInput=$('.sc-num-input'),metro=$('.sc-metro'),bang=$('.sc-bang'),counter=$('.sc-counter'),inlet=$('.sc-window>.inlet');
- const stage=$('.sc-stage'),viewLabel=$('.sc-view-label'),bar=$('.sc-progress i'),text=$('.sc-text'),title=$('.sc-title'),meta=$('.sc-meta'),metroNote=$('.c-metro');
+ const patch=$('.sc-patch'),svg=$('.sc-cords'),toggle=$('.sc-toggle'),numBox=$('.sc-number'),numInput=$('.sc-num-input'),metro=$('.sc-metro'),bang=$('.sc-bang'),urn=$('.sc-counter'),inlet=$('.sc-window>.inlet');
+ const stage=$('.sc-stage'),chip=$('.sc-potw'),bar=$('.sc-progress i'),text=$('.sc-text'),title=$('.sc-title'),meta=$('.sc-meta'),metroNote=$('.c-metro');
  const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 
- // The featured work and its views.
- const index=Math.max(0,projects.findIndex(p=>p.object===(typeof PATCH_OF_THE_WEEK==='string'?PATCH_OF_THE_WEEK:'')));
- const work=projects[index];
- const img=(src,cls='')=>`<img class="cover-image${cls}" src="${esc(src)}" alt="${esc(work.title)}" draggable="false">`;
- const views=[];
- if(work.coverUrl||index<3)views.push({label:'output',html:artMarkup(index).replace(' loading="lazy"',''),fill:true});
- if(work.patchPreview)views.push({label:'patching view',html:work.patchPreviewDark?img(work.patchPreview,' only-light')+img(work.patchPreviewDark,' only-dark'):img(work.patchPreview),fill:false});
- if(work.previewVideo)views.push({label:'preview',html:`<video src="${esc(work.previewVideo)}" muted loop playsinline autoplay></video>`,fill:true});
- if(!views.length)views.push({label:'output',html:artMarkup(index),fill:true});
+ const EVERY=5;        // the Patch of the Week comes back after this many other works
+ const HOLD=1.6;       // and stays up this many times longer than the others
+ const WIDE_ENOUGH=1.3;// narrower images are shown whole on the patcher grid instead of cropped
+ const featured=Math.max(0,projects.findIndex(p=>p.object===(typeof PATCH_OF_THE_WEEK==='string'?PATCH_OF_THE_WEEK:'')));
 
- let view=-1,interval=START,elapsed=0,last=0,frame=0;
+ let interval=START,elapsed=0,last=0,frame=0,current=-1,since=0,pool=[],bag=[],history=[];
  let on=!reduce.matches,hover=false,focused=false;
- counter.textContent=`counter 0 ${views.length-1}`;
 
  // Patch cords, drawn from the real box positions so they always line up.
  const box=el=>{const r=el.getBoundingClientRect(),b=patch.getBoundingClientRect();return{l:r.left-b.left,r:r.right-b.left,t:r.top-b.top,b:r.bottom-b.top}};
@@ -37,36 +31,65 @@
   return `M ${a.x} ${a.y} V ${mid-k} Q ${a.x} ${mid} ${a.x+dir*k} ${mid} H ${z.x-dir*k} Q ${z.x} ${mid} ${z.x} ${mid+k} V ${z.y}`;
  }
  function drawCords(){
-  // Line the window's inlet up under the counter's outlet so the last cord drops straight.
+  // Line the window's inlet up under urn's outlet so the last cord drops straight.
   const w=$('.sc-window').getBoundingClientRect();
-  inlet.style.left=(counter.getBoundingClientRect().left-w.left-1+7.5)+'px';
+  inlet.style.left=(urn.getBoundingClientRect().left-w.left-1+7.5)+'px';
   const b=patch.getBoundingClientRect(),r=inlet.getBoundingClientRect();
   const win={x:r.left-b.left+r.width/2,y:r.top-b.top};
   svg.innerHTML=[
    ['metro',cord(outlet(toggle),inletL(metro))],
    ['number',cord(outlet(numBox),inletR(metro))],
    ['metro',cord(outlet(metro),inletL(bang))],
-   ['metro',cord(outlet(metro),inletL(counter))],
-   ['metro',cord(outlet(counter),win)]
+   ['metro',cord(outlet(metro),inletL(urn))],
+   ['metro',cord(outlet(urn),win)]
   ].map(([k,d])=>`<path data-from="${k}" d="${d}"/>`).join('');
  }
  function flash(el){el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit')}
  function glow(which){const paths=svg.querySelectorAll(which?`path[data-from="${which}"]`:'path');paths.forEach(p=>p.classList.add('hot'));setTimeout(()=>paths.forEach(p=>p.classList.remove('hot')),200)}
 
- function showView(k,animate=true){
-  k=(k+views.length)%views.length;if(k===view)return;view=k;
-  const v=views[k];
-  const layer=document.createElement('div');layer.className='sc-layer'+(v.fill?'':' fit');layer.innerHTML=v.html;
+ // The works urn picks from: whatever the gallery filter shows, minus the Patch of the Week.
+ function poolFor(){const f=typeof filter==='string'?filter:'All';return projects.map((_,i)=>i).filter(i=>i!==featured&&(f==='All'||projects[i].categories.includes(f)))}
+ function fromUrn(){
+  if(!pool.length)return featured;
+  if(!bag.length){bag=pool.filter(i=>i!==current);for(let i=bag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]]}}
+  return bag.pop()??pool[0];
+ }
+ function nextWork(){
+  if(current!==featured&&(since>=EVERY||!pool.length)){since=0;return featured}
+  since++;return fromUrn();
+ }
+ const holdFor=()=>current===featured?interval*HOLD:interval;
+ function fit(layer,ratio){layer.classList.toggle('framed',ratio<WIDE_ENOUGH);layer.style.setProperty('--ar',ratio)}
+ function show(i,{remember=true,animate=true}={}){
+  if(i===undefined||i<0||i===current)return;
+  if(remember&&current>=0){history.push(current);if(history.length>40)history.shift()}
+  current=i;const p=projects[i];
+  const layer=document.createElement('div');layer.className='sc-layer';layer.innerHTML=artMarkup(i).replace(' loading="lazy"','');
+  const [w,h]=p.imageAspect.split('/').map(Number);fit(layer,w/h);
+  const img=layer.querySelector('img');
+  if(img){const measure=()=>{if(img.naturalWidth&&img.naturalHeight)fit(layer,img.naturalWidth/img.naturalHeight)};img.complete?measure():img.addEventListener('load',measure,{once:true})}
   const old=[...stage.querySelectorAll('.sc-layer')];
-  stage.insertBefore(layer,viewLabel);
+  stage.append(layer);
   if(animate&&!reduce.matches){
    layer.animate([{opacity:0,transform:'scale(1.03)'},{opacity:1,transform:'none'}],{duration:650,easing:'cubic-bezier(.2,.7,.2,1)'}).finished.catch(()=>{}).then(()=>old.forEach(o=>o.remove()));
-   viewLabel.animate([{opacity:0},{opacity:1}],{duration:350});
+   text.animate([{opacity:0,transform:'translateY(4px)'},{opacity:1,transform:'none'}],{duration:350,easing:'ease-out'});
   }else old.forEach(o=>o.remove());
-  viewLabel.textContent=v.label;
+  title.textContent=p.title;
+  meta.textContent=typeof metaLine==='function'?metaLine(p,i):'';
+  stage.setAttribute('aria-label','View '+p.title);
+  // The "patch of the week" label only shows for the featured work, and lights up when it arrives.
+  const isFeatured=i===featured;
+  root.classList.toggle('is-potw',isFeatured);
+  if(isFeatured&&animate&&!reduce.matches){chip.classList.remove('arrive');void chip.offsetWidth;chip.classList.add('arrive')}
   elapsed=0;bar.style.transform='scaleX(0)';
  }
- function fire(){flash(bang);flash(counter);glow('metro');showView(view+1)}
+ function fire(){flash(bang);flash(urn);glow('metro');show(nextWork())}
+ function syncPool(){
+  const next=poolFor();if(next.join()===pool.join())return;
+  pool=next;bag=[];history=history.filter(i=>i===featured||pool.includes(i));
+  urn.textContent='urn '+Math.max(1,pool.length);drawCords();
+  if(current!==featured&&!pool.includes(current)){since=0;show(featured,{remember:false})}
+ }
 
  // Number box -> metro right inlet.
  const fmt=ms=>ms<1000?`every ${ms} ms`:`every ${+(ms/1000).toFixed(2)} sec`;
@@ -74,7 +97,7 @@
   ms=Math.round(Math.min(MAX,Math.max(MIN,Number(ms)||interval)));
   if(ms!==interval&&flashIt){flash(numBox);glow('number')}
   interval=ms;numInput.value=ms;metroNote.textContent=fmt(ms);
-  if(elapsed>=interval)elapsed=interval;
+  if(elapsed>=holdFor())elapsed=holdFor();
  }
  let drag=null;
  numBox.addEventListener('pointerdown',e=>{
@@ -106,8 +129,8 @@
  function loop(now){
   if(!playing()){frame=0;update();return}
   elapsed+=Math.min(now-last,100);last=now;
-  if(elapsed>=interval)fire();
-  bar.style.transform=`scaleX(${Math.min(1,elapsed/interval)})`;
+  if(elapsed>=holdFor())fire();
+  bar.style.transform=`scaleX(${Math.min(1,elapsed/holdFor())})`;
   frame=requestAnimationFrame(loop);
  }
  function update(){
@@ -119,8 +142,12 @@
  toggle.addEventListener('click',()=>{
   on=!on;toggle.setAttribute('aria-pressed',on);toggle.setAttribute('aria-label',on?'Pause showcase':'Play showcase');update();
  });
- root.querySelectorAll('[data-sc]').forEach(b=>b.addEventListener('click',()=>{flash(b);showView(view+(b.dataset.sc==='next'?1:-1))}));
- stage.addEventListener('click',()=>(window.openWork||openProject)(index,stage));
+ root.querySelectorAll('[data-sc]').forEach(b=>b.addEventListener('click',()=>{
+  flash(b);
+  if(b.dataset.sc==='next')show(nextWork());
+  else if(history.length)show(history.pop(),{remember:false});
+ }));
+ stage.addEventListener('click',()=>(window.openWork||openProject)(current,stage));
  bang.addEventListener('click',fire);
  const win=$('.sc-window');
  win.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'){hover=true;update()}});
@@ -171,11 +198,12 @@
  }
  window.addEventListener('resize',clearShowcase);document.fonts.ready.then(clearShowcase);beside.addEventListener('change',clearShowcase);
 
- title.textContent=work.title;
- meta.textContent=typeof metaLine==='function'?metaLine(work,index):'';
- stage.setAttribute('aria-label','View '+work.title);
  toggle.setAttribute('aria-pressed',on);toggle.setAttribute('aria-label',on?'Pause showcase':'Play showcase');
  setInterval_(START,{flashIt:false});
- showView(0,false);
+ // The gallery rewrites its count whenever the filter changes: that's the cue to refilter urn.
+ const countEl=document.querySelector('#count');
+ if(countEl)new MutationObserver(syncPool).observe(countEl,{childList:true,characterData:true,subtree:true});
+ pool=poolFor();urn.textContent='urn '+pool.length;
+ show(featured,{remember:false,animate:false});
  clearShowcase();drawCords();update();
 })();

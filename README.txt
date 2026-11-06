@@ -8,18 +8,18 @@ EXTERNAL LINKS
 Cycling 74 and remote .maxpat downloads require internet. Opening a patch in Max requires an installed copy of Max and browser permission. The website cannot launch an application that is not installed. Most artworks are clearly labeled placeholders; their patch files and artist credits are not yet supplied.
 
 RSVP / EVENT
-The countdown targets December 3, 2026 (Pacific time), tentatively. It counts to the date, not a confirmed party time. RSVP links to the local event information section until a real RSVP URL is supplied. Edit dist-equivalent launch.js in this folder to update event settings.
+The countdown targets December 11, 2026 (Pacific time), tentatively. It counts to the date, not a confirmed party time. RSVP links to the local event information section until a real RSVP URL is supplied. Edit dist-equivalent launch.js in this folder to update event settings.
 
 EDITING
 app.js: projects, category tags, artwork details and cable routing.
 style.css: core styles. object-skin.css: Max-inspired box styling.
 launch.js: countdown and celebration behavior.
-showcase.js / showcase.css: the Patch of the week showcase (toggle, number box -> metro, counter). It steps through one work's views. Pick the work with PATCH_OF_THE_WEEK at the top of the data in app.js. The number box sets the metro speed: drag it, or click and type.
+showcase.js / showcase.css: the homepage showcase (toggle, number box -> metro, urn). It opens on the Patch of the Week (PATCH_OF_THE_WEEK in app.js), then urn picks other works at random, bringing the Patch of the Week back every 5 picks (EVERY in showcase.js) with its label lit up. The rotation follows the gallery filter.
 credits.html: team / CADRE / SJSU information.
 submit.html: the Submit a patch page: the guide (what to send, examples, rules, review steps) with the form right below it (submit-form.js).
 
 ADDING A WORK (app.js)
-Each work can have: title, artist, categories, description,
+Each work can have: title, artist, categories, description, statement (artist statement),
 portfolioUrl, coverUrl + imageAspect, patchPreview (patching screenshot), patchFileUrl,
 previewVideo (MP4) + previewPoster, or previewAudio (MP3), and previewNote.
 The Preview section and Portfolio link only show up when those fields are filled in.
@@ -42,3 +42,5 @@ Filter: the "filter" menu object above the gallery. Its colored outlets send the
 Category colors: --c-sound, --c-visual, --c-interactive, --c-3d, --c-other at the bottom of style.css (dark versions in dark.css).
 Gallery / List switch: at the bottom of the filter menu (Layout). The choice is remembered per browser.
 submit-form.js: the submission form. Files are picked from the visitor's computer (click or drag and drop) and previewed with a live card whose glow comes from the tags. Nothing is uploaded yet; once there's a server, send the FormData from collect() in the submit handler.
+"What is Max?": the button under the title on the homepage opens a short explanation for visitors who don't know Max (in index.html, class what-is-max).
+Filter menu cord: inside the open filter menu, a cord comes in at the top left and runs down a rail into the current category's inlet. Drag its square plug to another category to filter (code at the end of the filter section in app.js).

@@ -1,6 +1,6 @@
 // Change this single value when the launch date is confirmed.
 // Midnight Pacific marks the date only; the party start time is still TBD.
-const LAUNCH_DATE = '2026-12-03T00:00:00-08:00';
+const LAUNCH_DATE = '2026-12-11T00:00:00-08:00';
 // Each digit is a little reel of numbers that rolls to the new value, like an odometer.
 // Counting down, the next number drops in from above.
 const REEL_STEP=1.2; // em, matches the digit height in style.css
@@ -27,7 +27,7 @@ function updateCountdown(now=Date.now()){
  const remaining=Math.max(0,Math.floor((Date.parse(LAUNCH_DATE)-now)/1000));
  const values={days:Math.floor(remaining/86400),hours:Math.floor(remaining/3600)%24,minutes:Math.floor(remaining/60)%60,seconds:remaining%60};
  for(const [unit,n] of Object.entries(values)){const el=document.querySelector(`[data-unit="${unit}"]`);if(el)roll(el,String(n).padStart(2,'0'))}
- const clock=document.querySelector('.clock');if(clock)clock.setAttribute('aria-label',`${values.days} days, ${values.hours} hours, ${values.minutes} minutes until December 3, 2026, Pacific time. Event time unconfirmed.`);
+ const clock=document.querySelector('.clock');if(clock)clock.setAttribute('aria-label',`${values.days} days, ${values.hours} hours, ${values.minutes} minutes until December 11, 2026, Pacific time. Event time unconfirmed.`);
  if(!remaining){const note=document.querySelector('.launch-note');if(note)note.textContent='The tentative date has arrived. Event details to be confirmed.'}
 }
 updateCountdown();setInterval(()=>{if(!document.hidden)updateCountdown()},1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateCountdown()});

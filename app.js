@@ -141,7 +141,7 @@ function openProject(i,dir=0){
  const preview=p.patchPreview?`<figure class="patch-preview"><div class="zoom-pane" title="Double-click to zoom, drag to look around"><div class="zoom-inner"><img${p.patchPreviewDark?' class="only-light"':''} src="${esc(p.patchPreview)}" alt="${esc(p.title)} patching view showing object boxes and their connections" draggable="false">${p.patchPreviewDark?`<img class="only-dark" src="${esc(p.patchPreviewDark)}" alt="${esc(p.title)} patching view, dark theme" draggable="false">`:''}</div><div class="zoom-ui"><span class="zoom-level" aria-live="polite">100%</span><button type="button" class="sc-msg" data-z="out" aria-label="Zoom out">−</button><button type="button" class="sc-msg" data-z="in" aria-label="Zoom in">+</button><button type="button" class="sc-msg" data-z="fit" aria-label="Fit to window">fit</button></div></div><figcaption>${esc(p.previewCaption||'Patching view: object boxes and connections, outside presentation mode.')}</figcaption></figure>`:`<div class="patch-empty"><span class="empty-object">p ${esc(p.object)}</span><strong>Patching view to be added</strong><p>The artist’s screenshot will show the object boxes and connections outside presentation mode.</p></div>`;
  const action=deepLink?`<a class="open-patcher primary" href="${esc(deepLink)}" id="open-patcher">Open patcher <span aria-hidden="true">↗</span></a><a class="patch-file-link" href="${esc(p.patchFileUrl)}" target="_blank" rel="noopener">Get .maxpat file ↗</a>`:p.patchFileUrl?`<a class="open-patcher primary" href="${esc(p.patchFileUrl)}" download target="_blank" rel="noopener">Download .maxpat <span aria-hidden="true">↓</span></a>`:`<button class="open-patcher" disabled aria-describedby="patch-help">Open patcher <span aria-hidden="true">↗</span></button>`;
  const portfolio=p.portfolioUrl?`<a class="portfolio-link" href="${esc(p.portfolioUrl)}" target="_blank" rel="noopener">Portfolio <span aria-hidden="true">↗</span></a>`:'';
- show('p '+p.object,`<div class="detail-top ${Number(p.imageAspect.split('/')[0])/Number(p.imageAspect.split('/')[1])<1?'portrait-detail':''}"><div class="detail-cover">${artMarkup(i)}<span class="detail-caption">${p.isReference?'Reference example from the Art 103 repository':p.isStudent?'Output from the patch, rendered in Max':'Placeholder · Student details to come'}</span></div><div class="detail-info"><h3>Title</h3><h2 class="detail-title">${esc(p.title)}</h2><div class="detail-meta"><div><h3>Artist</h3><p>${esc(p.artist)}${portfolio?' · '+portfolio:''}</p></div><div><h3>Tags</h3><p class="tag-chips">${p.categories.map(c=>`<span class="chip" style="--cat:var(--c-${catKey(c)})">${esc(c)}</span>`).join('')}</p></div></div><h3>Summary</h3><p class="detail-summary">${esc(p.description)}</p></div></div>${previewMarkup(p)}<section class="patch-section"><div class="patch-section-title"><h3>Patcher</h3><span>PATCHING VIEW</span></div>${preview}</section><div class="patch-actions">${action}</div><p id="patch-help" class="patch-help">${deepLink?'Requires Max installed on your computer. Your browser may ask you to allow Max to open. If it does not open, get the .maxpat file and open it in Max.':p.patchFileUrl?'Download the file and open it in Max. Open patcher (straight into Max) will work once the file is hosted online.':'This placeholder does not have a patch file yet. Open patcher will be available when the artist’s file is added.'}</p><p id="launch-status" role="status"></p>`,true);
+ show('p '+p.object,`<div class="detail-top ${Number(p.imageAspect.split('/')[0])/Number(p.imageAspect.split('/')[1])<1?'portrait-detail':''}"><div class="detail-cover">${artMarkup(i)}<span class="detail-caption">${p.isReference?'Reference example from the Art 103 repository':p.isStudent?'Output from the patch, rendered in Max':'Placeholder · Student details to come'}</span></div><div class="detail-info"><h3>Title</h3><h2 class="detail-title">${esc(p.title)}</h2><div class="detail-meta"><div><h3>Artist</h3><p>${esc(p.artist)}${portfolio?' · '+portfolio:''}</p></div><div><h3>Tags</h3><p class="tag-chips">${p.categories.map(c=>`<span class="chip" style="--cat:var(--c-${catKey(c)})">${esc(c)}</span>`).join('')}</p></div></div>${p.statement?`<h3>Artist statement</h3><p class="detail-summary detail-statement">${esc(p.statement)}</p>`:''}<h3>${p.statement?'How it works':'Summary'}</h3><p class="detail-summary">${esc(p.description)}</p></div></div>${previewMarkup(p)}<section class="patch-section"><div class="patch-section-title"><h3>Patcher</h3><span>PATCHING VIEW</span></div>${preview}</section><div class="patch-actions">${action}</div><p id="patch-help" class="patch-help">${deepLink?'Requires Max installed on your computer. Your browser may ask you to allow Max to open. If it does not open, get the .maxpat file and open it in Max.':p.patchFileUrl?'Download the file and open it in Max. Open patcher (straight into Max) will work once the file is hosted online.':'This placeholder does not have a patch file yet. Open patcher will be available when the artist’s file is added.'}</p><p id="launch-status" role="status"></p>`,true);
  document.querySelector('#open-patcher')?.addEventListener('click',()=>{document.querySelector('#launch-status').textContent='If your browser asks, choose Open Max. The website cannot confirm whether Max opened.'});
  wireAudio(body);wireZoom(body);
  // Slide the new work in from the side it came from when flipping with the arrows.
@@ -208,6 +208,86 @@ filterMenu.addEventListener('keydown',e=>{
  else if(e.key==='Tab')closeMenu(false);
 });
 document.addEventListener('pointerdown',e=>{if(!filterObj.contains(e.target))closeMenu(false)});
+// The filter's patch cord. Inside the open menu, a cord comes in at the top left, runs down a
+// rail on the left and turns into the inlet of the chosen category, with rounded corners like a
+// segmented Max cord. Grab the square plug at its end and slide it to another category: the cord
+// keeps that same grid shape the whole time, snaps onto each inlet, and plugging it in filters.
+(function(){
+ const NS='http://www.w3.org/2000/svg';
+ const svg=document.createElementNS(NS,'svg');svg.setAttribute('class','fm-cords');svg.setAttribute('aria-hidden','true');
+ svg.innerHTML='<path class="fm-hit"/><path class="fm-base"/><path class="fm-stripe"/><rect class="fm-src" width="9" height="5"/><rect class="fm-plug" width="9" height="9"/>';
+ filterMenu.prepend(svg);
+ const hit=svg.querySelector('.fm-hit'),plug=svg.querySelector('.fm-plug'),paths=[...svg.querySelectorAll('.fm-base,.fm-stripe,.fm-hit')];
+ const catColor=f=>f==='All'?'var(--fm-all)':`var(--c-${catKey(f)})`;
+ const R=7;   // corner radius
+ let drag=null,anim=0,pos=null;
+ const rectIn=el=>{const m=filterMenu.getBoundingClientRect(),b=el.getBoundingClientRect();return{l:b.left-m.left,r:b.right-m.left,t:b.top-m.top,b:b.bottom-m.top,cy:b.top+b.height/2-m.top}};
+ // Where the cord comes from: an outlet at the top left of the menu.
+ const src=svg.querySelector('.fm-src');
+ // Lined up under the filter object's top inlet, so the box has a matching inlet and outlet.
+ function origin(){const fi=document.querySelector('.fo-inlet').getBoundingClientRect(),m=filterMenu.getBoundingClientRect();return{x:fi.left+fi.width/2-m.left,y:5}}
+ // The cord ends at the left edge of the category's square; the plug sits right on top of it.
+ const inletPoint=item=>{const r=rectIn(item.querySelector('.fm-in'));return{x:r.l,y:r.cy}};
+ const checked=()=>filterItems.find(x=>x.getAttribute('aria-checked')==='true')||filterItems[0];
+ // Down the rail, a rounded corner, then across to the end point. Always on the grid.
+ function route(end){
+  const o=origin(),dy=end.y-o.y,dx=end.x-o.x;
+  if(dy<2*R||Math.abs(dx)<1)return `M ${o.x} ${o.y} V ${Math.max(o.y,end.y)}`;
+  const k=Math.min(R,Math.abs(dx)),dir=dx<0?-1:1;
+  return `M ${o.x} ${o.y} V ${end.y-k} Q ${o.x} ${end.y} ${o.x+dir*k} ${end.y} H ${end.x}`;
+ }
+ function paint(end,color){
+  const d=route(end);paths.forEach(p=>p.setAttribute('d',d));
+  plug.setAttribute('x',end.x);plug.setAttribute('y',end.y-4.5);
+  svg.style.setProperty('--fm-c',color);pos=end;
+ }
+ function sizeSvg(){const r=filterMenu.getBoundingClientRect(),o=origin();svg.setAttribute('viewBox',`0 0 ${r.width} ${r.height}`);src.setAttribute('x',o.x-4.5);src.setAttribute('y',0)}
+ function draw(){if(filterMenu.hidden||drag)return;sizeSvg();const it=checked();paint(inletPoint(it),catColor(it.dataset.filter))}
+ const rowAt=y=>filterItems.find(it=>{const r=rectIn(it);return y>=r.t-1&&y<=r.b+1});
+ // The plug eases toward its target each frame, so it glides between inlets.
+ function glide(){
+  if(!drag)return;
+  const t=drag.target,goal=t?inletPoint(t):drag.free,k=t?.35:.5;
+  const next={x:pos.x+(goal.x-pos.x)*k,y:pos.y+(goal.y-pos.y)*k};
+  paint(next,t?catColor(t.dataset.filter):'var(--fm-all)');
+  anim=requestAnimationFrame(glide);
+ }
+ function start(e){
+  if(e.button!==0)return;e.preventDefault();e.stopPropagation();cancelAnimationFrame(anim);
+  drag={id:e.pointerId,target:checked(),free:pos};svg.setPointerCapture(e.pointerId);svg.classList.add('dragging');
+  drag.target.classList.add('drop-target');anim=requestAnimationFrame(glide);
+ }
+ function move(e){
+  if(!drag||e.pointerId!==drag.id)return;
+  const m=filterMenu.getBoundingClientRect(),y=e.clientY-m.top,x=e.clientX-m.left,o=origin();
+  const t=rowAt(y);
+  if(t!==drag.target){drag.target?.classList.remove('drop-target');t?.classList.add('drop-target');drag.target=t}
+  // Off a row, the plug follows the pointer (still on the grid: down the rail, then across).
+  drag.free={x:Math.max(o.x+R+12,Math.min(m.width-8,x)),y:Math.max(o.y+2*R,Math.min(m.height-8,y))};
+ }
+ function end(e){
+  if(!drag||e.pointerId!==drag.id)return;
+  cancelAnimationFrame(anim);svg.classList.remove('dragging');
+  const t=drag.target;t?.classList.remove('drop-target');drag=null;
+  if(t){
+   filterItems.forEach(x=>x.setAttribute('aria-checked',x===t?'true':'false'));draw();
+   if(!reducedMotion.matches){plug.animate([{transform:'scale(1.4)'},{transform:'none'}],{duration:260,easing:'ease-out'});t.animate([{background:`color-mix(in srgb,${catColor(t.dataset.filter)} 40%,var(--paper))`},{}],{duration:420})}
+   setTimeout(()=>chooseFilter(t.dataset.filter),reducedMotion.matches?0:340);
+   return;
+  }
+  // Let go between rows: glide back to the inlet it was plugged into.
+  const it=checked(),goal=inletPoint(it);
+  if(reducedMotion.matches){draw();return}
+  const back=()=>{const next={x:pos.x+(goal.x-pos.x)*.3,y:pos.y+(goal.y-pos.y)*.3};paint(next,catColor(it.dataset.filter));if(Math.hypot(goal.x-next.x,goal.y-next.y)>.5)anim=requestAnimationFrame(back);else draw()};
+  anim=requestAnimationFrame(back);
+ }
+ [hit,plug].forEach(el=>el.addEventListener('pointerdown',start));
+ svg.addEventListener('pointermove',move);svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
+ // Keyboard: arrow keys already move through the list; Enter picks. The cord follows the choice.
+ new MutationObserver(()=>{filterObj.classList.toggle('menu-open',!filterMenu.hidden);requestAnimationFrame(draw)}).observe(filterMenu,{attributes:true,attributeFilter:['hidden']});
+ filterItems.forEach(x=>new MutationObserver(draw).observe(x,{attributes:true,attributeFilter:['aria-checked']}));
+ window.addEventListener('resize',draw);
+})();
 // Gallery / List switch, tucked at the bottom of the filter menu. The choice is remembered in this browser.
 const viewButtons=[...document.querySelectorAll('.view-toggle [data-view]')];
 function setView(v,animate=true){
@@ -313,3 +393,52 @@ function wireZoom(scope){
  pane.addEventListener('pointerup',end);pane.addEventListener('pointercancel',end);
  paint();
 }
+// "What is Max?": the answer slides down slowly and its text follows in a gentle stagger.
+// The example patch gets real cords: out of each object's bottom outlet, bending into the top
+// inlet of the next one (rounded, like Max's segmented cords), animated like the filter cables.
+(function(){
+ const d=document.querySelector('.what-is-max');if(!d)return;
+ const summary=d.querySelector('summary'),panel=d.querySelector('.wm-body'),ex=d.querySelector('.wm-example'),svg=d.querySelector('.wm-cords');
+ const parts=[...panel.children];
+ // adc~ -> peakamp~ is an audio signal (yellow stripe); peakamp~ -> the shape drives a visual (blue).
+ const CORDS=['sound','visual'];
+ function drawCords(){
+  if(!d.open)return;
+  const box=ex.getBoundingClientRect(),objs=[...ex.querySelectorAll('.wm-obj')].map(o=>o.getBoundingClientRect());
+  svg.setAttribute('viewBox',`0 0 ${box.width} ${box.height}`);
+  svg.innerHTML=objs.slice(0,-1).map((a,k)=>{
+   const z=objs[k+1],x1=a.left-box.left+6.5,y1=a.bottom-box.top+1,x2=z.left-box.left+6.5,y2=z.top-box.top-1;
+   const mid=(y1+y2)/2,r=Math.min(6,(x2-x1)/2,(y2-y1)/2);
+   const dPath=`M ${x1} ${y1} V ${mid-r} Q ${x1} ${mid} ${x1+r} ${mid} H ${x2-r} Q ${x2} ${mid} ${x2} ${mid+r} V ${y2}`;
+   return `<g style="--cat:var(--c-${CORDS[k]})"><path class="base" d="${dPath}"/><path class="stripe" d="${dPath}"/></g>`;
+  }).join('');
+ }
+ // Keep the gallery, filter and title cables in step with the panel while it moves.
+ let follow=0,busy=false;
+ function followLayout(ms){const end=performance.now()+ms;cancelAnimationFrame(follow);const step=()=>{window.dispatchEvent(new Event('resize'));if(performance.now()<end)follow=requestAnimationFrame(step)};follow=requestAnimationFrame(step)}
+ function open(){
+  d.open=true;drawCords();
+  if(reducedMotion.matches){followLayout(0);return}
+  const h=panel.offsetHeight;
+  panel.animate([{height:'0px',opacity:0,marginTop:'0px'},{height:h+'px',opacity:1,marginTop:getComputedStyle(panel).marginTop}],{duration:650,easing:'cubic-bezier(.25,.8,.25,1)'});
+  parts.forEach((el,k)=>el.animate([{opacity:0,transform:'translateY(-12px)'},{opacity:1,transform:'none'}],{duration:600,delay:120+k*110,easing:'cubic-bezier(.2,.8,.2,1)',fill:'backwards'}));
+  // The cords draw themselves in once the example has landed.
+  busy=true;
+  svg.querySelectorAll('g').forEach((g,k)=>{
+   const base=g.querySelector('.base'),stripe=g.querySelector('.stripe'),L=base.getTotalLength(),delay=420+k*280;
+   base.animate([{strokeDasharray:`0 ${L}`},{strokeDasharray:`${L} 0`}],{duration:380,delay,easing:'ease-out',fill:'backwards'});
+   stripe.animate([{opacity:0},{opacity:1}],{duration:250,delay:delay+330,fill:'backwards'});
+  });
+  setTimeout(()=>{busy=false;drawCords()},420+CORDS.length*280+700);
+  followLayout(700);
+ }
+ function close(){
+  if(reducedMotion.matches){d.open=false;followLayout(0);return}
+  const h=panel.offsetHeight;
+  panel.animate([{height:h+'px',opacity:1},{height:'0px',opacity:0,marginTop:'0px'}],{duration:420,easing:'cubic-bezier(.5,0,.6,1)'}).finished.then(()=>{d.open=false;followLayout(60)},()=>{});
+  followLayout(460);
+ }
+ summary.addEventListener('click',e=>{e.preventDefault();if(panel.getAnimations().length)return;d.open?close():open()});
+ window.addEventListener('resize',()=>{if(!busy)drawCords()});
+ document.fonts.ready.then(drawCords);
+})();

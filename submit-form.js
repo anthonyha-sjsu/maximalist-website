@@ -1,5 +1,5 @@
 /* The submission form on submit.html.
-   Order: Max project, title, thumbnail, tags (they set the card's glow), name, description.
+   Order: title, name, description, artist statement, tags (they set the card's glow), thumbnail, Max project.
    Files are picked from the visitor's computer (click or drag and drop) and previewed here, but
    nothing is uploaded yet: there's no server. When a backend exists, send the FormData from
    collect() to it in the submit handler. */
@@ -17,14 +17,15 @@
  </div><small class="field-help" id="${name}-help">${help}</small></div>`;
 
  slot.innerHTML=`<div class="submit-layout"><form id="draft" novalidate>
-${drop('project','Max project','.maxpat, .maxproj, .amxd, or a .zip of the project folder · up to 200 MB','.maxpat,.maxproj,.amxd,.zip','If it uses samples, videos or abstractions, zip the whole folder.',true)}
 <label class="field">Title of project<input name="title" required maxlength="150" placeholder="What is it called?"></label>
-${drop('thumbnail','Thumbnail','JPG, PNG or GIF · at least 1600px wide · up to 20 MB','image/*','A still of the piece running. This is the image on your gallery card.',true)}
+<label class="field">Name of artist<input name="artist" required maxlength="100" autocomplete="name" placeholder="How you want to be credited"></label>
+<label class="field">Description <small>how it works</small><textarea name="description" required maxlength="1200" placeholder="What does it do, and how? Name a few of the objects you used."></textarea><small class="field-help"><span class="count" data-for="description">0</span> / 1200</small></label>
+<label class="field">Artist statement <small>what it’s about and why you made it</small><textarea name="statement" required maxlength="1500" placeholder="What were you exploring? What should someone feel or notice when they see it?"></textarea><small class="field-help"><span class="count" data-for="statement">0</span> / 1500</small></label>
 <fieldset class="field tag-picker"><legend>Tags <small>choose all that apply · they set your card’s glow</small></legend>
  <div class="tag-row">${TAGS.map(([k,l])=>`<label class="tag-pill" style="--cat:var(--c-${k})"><input type="checkbox" name="tags" value="${k}"><i></i>${l}</label>`).join('')}</div>
 </fieldset>
-<label class="field">Name of artist<input name="artist" required maxlength="100" autocomplete="name" placeholder="How you want to be credited"></label>
-<label class="field">Description<textarea name="description" required maxlength="1200" placeholder="What does it do, and how? Name a few of the objects you used."></textarea><small class="field-help"><span class="count">0</span> / 1200</small></label>
+${drop('thumbnail','Thumbnail','JPG, PNG or GIF · at least 1600px wide · up to 20 MB','image/*','A still of the piece running. This is the image on your gallery card.',true)}
+${drop('project','Max project','.maxpat, .maxproj, .amxd, or a .zip of the project folder · up to 200 MB','.maxpat,.maxproj,.amxd,.zip','If it uses samples, videos or abstractions, zip the whole folder.',true)}
 <details class="extras"><summary>More (optional)</summary>
 ${drop('patching','Patching view screenshot','PNG · unlocked, every object visible','image/*','Shown in the Patcher section of your artwork window.',false)}
 ${drop('preview','Preview video or audio','MP4 under 50 MB, or MP3 under 10 MB','video/mp4,audio/mpeg,.mp4,.mp3','A short recording of the patch running.',false)}
@@ -92,7 +93,7 @@ ${drop('preview','Preview video or audio','MP4 under 50 MB, or MP3 under 10 MB',
   glow.style.background=cols.length===1?cols[0]:`conic-gradient(from 200deg,${[...cols,cols[0]].join(',')})`;
   slot.querySelector('.lp-card').style.setProperty('--cat',cols[0]);
   slot.querySelector('.lp-card').classList.toggle('tagged',tags.length>0);
-  const count=form.querySelector('.count');count.textContent=form.elements.description.value.length;
+  form.querySelectorAll('.count[data-for]').forEach(c=>c.textContent=form.elements[c.dataset.for].value.length);
  }
  form.addEventListener('input',updatePreview);form.addEventListener('change',updatePreview);
  // Once a missing field gets filled in, drop its red outline right away.
@@ -101,7 +102,7 @@ ${drop('preview','Preview video or audio','MP4 under 50 MB, or MP3 under 10 MB',
  form.addEventListener('drop',e=>e.target.closest('.dropzone')?.classList.remove('missing'));
 
  // ---- Drafts (text only; browsers can't keep the files themselves between visits)
- const KEYS=['title','artist','description','portfolio','ai'];
+ const KEYS=['title','artist','description','statement','portfolio','ai'];
  try{const d=JSON.parse(localStorage.getItem('maximalist-draft')||'{}');KEYS.forEach(k=>{if(typeof d[k]==='string'&&form.elements[k])form.elements[k].value=d[k]});const t=Array.isArray(d.tags)?d.tags:[];form.querySelectorAll('[name=tags]').forEach(x=>x.checked=t.includes(x.value))}catch{}
  function say(msg){saved.textContent=msg;if(!reduce.matches)saved.animate([{opacity:0},{opacity:1}],{duration:200})}
  slot.querySelector('#save').addEventListener('click',()=>{
@@ -114,12 +115,13 @@ ${drop('preview','Preview video or audio','MP4 under 50 MB, or MP3 under 10 MB',
  form.addEventListener('submit',e=>{
   e.preventDefault();
   const problems=[];
-  if(!files.project)problems.push(['project','your Max project file']);
   if(!form.elements.title.value.trim())problems.push(['title','a title']);
-  if(!files.thumbnail)problems.push(['thumbnail','a thumbnail']);
-  if(!form.querySelector('[name=tags]:checked'))problems.push(['tags','at least one tag']);
   if(!form.elements.artist.value.trim())problems.push(['artist','your name']);
   if(!form.elements.description.value.trim())problems.push(['description','a description']);
+  if(!form.elements.statement.value.trim())problems.push(['statement','an artist statement']);
+  if(!form.querySelector('[name=tags]:checked'))problems.push(['tags','at least one tag']);
+  if(!files.thumbnail)problems.push(['thumbnail','a thumbnail']);
+  if(!files.project)problems.push(['project','your Max project file']);
   slot.querySelectorAll('.missing').forEach(x=>x.classList.remove('missing'));
   if(problems.length){
    problems.forEach(([k])=>{const el=k==='tags'?form.querySelector('.tag-picker'):form.querySelector(`.dropzone[data-name="${k}"]`)||form.elements[k];el.classList.add('missing')});
